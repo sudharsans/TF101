@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="keywords" content="devops,terraform" />
     <meta name="description" content="Introduction to Terraform" />
-    <title>Automating Dev box setup</title>
+    <title>Introduction to Terraform</title>
     <style>
       @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -156,19 +156,25 @@ layout: false
 .right-column[
 I have been using Terraform for the last 5 months.
 
-Our Kubernetes cluster is bootstrapped using Terraform + Ansible, which in turn is driving one of our products in production.
+Our *Kubernetes* cluster is bootstrapped using Terraform + Ansible, which in turn is driving one of our products in production.
 
 Terraform is used to create/configure/provision
 
-- VPC, Security groups, route tables,
-- EC2 instances
-- ELBs and Auto-scaling groups
-- Route53 zones and records
-- IAM roles and policies
-- CloudWatch alarms
-- SNS topics and subscriptions.
-- AWS Lambda functions.
+- VPC, Security groups, route tables
 
+- EC2 instances
+
+- ELBs and Auto-scaling groups
+
+- Route53 zones and records
+
+- IAM roles and policies
+
+- CloudWatch alarms
+
+- SNS topics and subscriptions
+
+- AWS Lambda functions
 ]
 ---
 .left-column[
@@ -177,11 +183,281 @@ Terraform is used to create/configure/provision
 ]
 .right-column[
 # "Infrastructure as Code"
+
+> Infrastructure as code is the approach to defining computing and network infrastructure through source code that can then be treated just like any software system.
+
+Terraform allows you to create, change (and destroy) your infrastructure.
+
+Terraform uses a configuration DSL to describe and version your infrastructure as code.
+
+Terraform is ~cloud-agnostic~ multi-cloud aware. Supports IaaS (e.g. AWS, DigitalOcean, GCE, OpenStack), PaaS (e.g. Heroku, CloudFoundry), or SaaS services (e.g. DNSimple, CloudFlare)
 ]
 ---
-template: inverse
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+]
+.right-column[
+Terraform is writting with golang and runs on all major platforms.
 
-#Demo time!
+Terraform is essentially a set of binaries.
+
+```bash
+± |master ✓| → tree ./
+./
+├── terraform
+├── terraform-provider-atlas
+├── terraform-provider-aws
+├── terraform-provider-azure
+├── terraform-provider-azurerm
+├── terraform-provider-chef
+├── terraform-provider-cloudflare
+├── terraform-provider-cloudstack
+├── terraform-provider-consul
+├── terraform-provider-digitalocean
+...
+```
+Installation is usually about downloading the official release archive, and adding terraform to your path.
+
+Homebrew Cask users can do `brew install terraform`.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+Terraform configuration is writting in `*.tf` files.
+
+It is based on the HashiCorp Configuration Language (HCL) [https://github.com/hashicorp/hcl](https://github.com/hashicorp/hcl)
+
+The first thing to do is add one or more `providers`.
+
+Providers are the abstraction over the APIs needed to create our infrastructure in different platforms.
+
+For example, the aws provider can be configured as follows:
+
+```
+provider "aws" {
+  access_key = "ACCESS_KEY_HERE"
+  secret_key = "SECRET_KEY_HERE"
+  region = "eu-west-1"
+}
+```
+This sets up Terraform to start creating resources in AWS. The credentials and region are required.
+
+In this case, these parameters can alternatively be passed via `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_DEFAULT_REGION` environment variables.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Resources
+
+Once one or more providers is configured, we can start using resources.
+
+With the AWS provider setup, we can start creating AWS resources like `EC2 instances`, `S3 buckets`, `VPCs` and more.
+
+The following snippet creates an EC2 instance:
+
+```
+resource "aws_instance" "example" {
+  ami = "ami-408c7f28"
+  instance_type = "t1.micro"
+}
+```
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Planning phase
+Once we have our configuration ready, we can see what it would end up doing by running `terraform plan`.
+
+The command will "plan" for what needs to be done to our infrastructure, based on the configuration we have written.
+
+It will give detailed report about which resources will be created, deleted and modified.
+
+It is recommended to save the plan using the `-out` argument and specifying the path to write a plan file:
+
+```bash
+terraform plan -out=plan1
+```
+
+This plan file can then be reliably used to ensure that you apply the steps that were actually planned.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Apply phase
+When we are happy with the plan, we can actually go ahead and apply the changes using:
+
+```
+terraform apply
+```
+
+We can also use a plan generated from a plan command:
+```
+terraform apply plan1
+```
+
+Plan and apply can also target particular resource(s) using the `-target` flag.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Variables
+In the simple examples, we saw values like the AWS region, EC2 AMI, instance type, etc in the configuration itself.
+
+It is ideal to extract out these into variables that we can easily reuse and override if needed.
+
+We can define a few variables in a `variables.tf` file like below:
+
+```
+variable "region" {
+  default = "eu-west-1"
+}
+
+variable "ami" {}
+
+variable "instance_type" {
+  description = "Instance type for our dummy instance"
+}
+
+```
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Assigning/Overriding Variables
+Variables without default values have to be assigned them.
+
+Terraform will prompt for these values, if they have not been assigned already, during plan/apply.
+
+Variables with default values can also be overriden.
+
+ - One way to assign/override variables is to use the `-var 'instance_type=t1.micro'` argument to `terraform plan` and `terraform apply`.
+
+ - A `terraform.tfvars` file can be created to hold variables values
+   ```
+   ami="ami-1208b761"
+   instance_type="t1.micro"
+   ```
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Output Variables
+We can also create variables that hold values dynamically generated as part of creating our infrastructure.
+
+For example, we can create an output variable for the ip of an instance:
+
+```
+output "ip" {
+  value = "${aws_instance.instance.private_ip}"
+}
+```
+
+We can query output variables using `terraform output` or `terraform output ip`.
+
+Output variables are useful in integrating terraform into rest of your tooling like scripts.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Provisioners
+Terraform can also integrate with provisioners like Chef (out of the box), Ansible, shell scripts etc.
+
+One way of doing this is to use the `provisioner` block. The following creates an EC2 instance and installs Nginx in it:
+
+```
+resource "aws_instance" "instance" {
+  ami = "${var.ami}"
+  instance_type = "${var.instance_type}"
+  associate_public_ip_address = true
+  key_name = "${aws_key_pair.demo.id}"
+  subnet_id = "${var.subnet_id}"
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get -y update",
+      "sudo apt-get -y install nginx",
+      "sudo service nginx start"
+    ]
+
+    connection {
+      user = "ubuntu"
+      private_key = "${file(var.private_key_path)}"
+    }
+  }
+}
+```
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+  Other Topics:
+
+  ### Templates
+  ### Modules
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+  ### - Pros and cons
+]
+.right-column[
+## Pros
+The state and configuration language of Terraform is very good.
+
+Great for evolving an infrastructure, especially when you are starting out.
+
+Active community. Frequent releases.
+
+## Cons
+
+Cannot import existing infra and start managing.
+
+Too strict with regard to immutability.
+
+Some weirdness in the configuration language - like can't pass map variables.
+
+Refactoring into modules is tricky when infra is already created
+
+]
 ---
 name: last-page
 template: inverse
