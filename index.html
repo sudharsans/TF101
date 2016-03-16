@@ -140,17 +140,17 @@ layout: false
   ## About me
 ]
 .right-column[
-  Software Engineer at Indix for the last 1.5 years.
+  Software Engineer at **Indix** for the last 1.5 years.
 
-  Previously worked with ThoughtWorks.
+  Previously worked with **ThoughtWorks**.
 
   Author of the book [Learning Continuous Integration with TeamCity](https://bitly.com/learningci)
 
   .small-img[![book](book.jpg)]
 
-  Working mostly with Scala and Javascript.
+  Working mostly with **Scala** and **Node.js/Javascript**.
 
-  Currently crazy about Docker, Kubernetes and Terraform.
+  Currently crazy about **Docker**, **Kubernetes** and **Terraform**.
 ]
 ---
 .left-column[
@@ -190,6 +190,8 @@ Terraform is used to create/configure/provision
 # "Infrastructure as Code"
 
 > Infrastructure as code is the approach to defining computing and network infrastructure through source code that can then be treated just like any software system.
+
+[http://martinfowler.com/bliki/InfrastructureAsCode.html](http://martinfowler.com/bliki/InfrastructureAsCode.html)
 
 Terraform allows you to create, change (and destroy) your infrastructure.
 
@@ -233,15 +235,39 @@ Homebrew Cask users can do `brew install terraform`.
   ### - Terraform Configuration
 ]
 .right-column[
-Terraform configuration is writting in `*.tf` files.
+## HCL and *.tf files
+
+Terraform configuration is written in `*.tf` files.
 
 It is based on the HashiCorp Configuration Language (HCL) [https://github.com/hashicorp/hcl](https://github.com/hashicorp/hcl)
 
+JSON is supported for code generation purposes.
+
+Most of the configuration takes the form:
+
+```
+keyword1 "some_name" {
+  key = value
+  nested {
+    key = value
+  }
+}
+```
+
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
+## Providers
 The first thing to do is add one or more `providers`.
 
 Providers are the abstraction over the APIs needed to create our infrastructure in different platforms.
 
-For example, the aws provider can be configured as follows:
+For example, the `aws` provider can be configured as follows:
 
 ```
 provider "aws" {
