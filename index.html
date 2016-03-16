@@ -120,6 +120,9 @@
         float: right;
         padding-top: 1em;
       }
+      .strikethrough {
+        text-decoration:line-through;
+      }
     </style>
   </head>
   <body>
@@ -192,7 +195,7 @@ Terraform allows you to create, change (and destroy) your infrastructure.
 
 Terraform uses a configuration DSL to describe and version your infrastructure as code.
 
-Terraform is ~cloud-agnostic~ multi-cloud aware. Supports IaaS (e.g. AWS, DigitalOcean, GCE, OpenStack), PaaS (e.g. Heroku, CloudFoundry), or SaaS services (e.g. DNSimple, CloudFlare)
+Terraform is .strikethrough[cloud-agnostic] multi-cloud aware. Supports IaaS (e.g. AWS, DigitalOcean, GCE, OpenStack), PaaS (e.g. Heroku, CloudFoundry), or SaaS services (e.g. DNSimple, CloudFlare)
 ]
 ---
 .left-column[
@@ -323,6 +326,25 @@ Plan and apply can also target particular resource(s) using the `-target` flag.
   ### - Terraform Configuration
 ]
 .right-column[
+## Destroy!
+We can, if we want to, destroy the entire infrastructure using
+
+```
+terraform destroy
+```
+By, default, this will ask for a confirmation `yes`. This can be avoided by using the `-force` flag.
+
+The plan -> apply -> destroy cycle is useful when you are trying out things. We can also destroy particular resources using the `-target` flag.
+
+Due to the state and configuration file, deleting/destroying a resource is as simple as removing that resource from `.tf` file.
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+]
+.right-column[
 ## Variables
 In the simple examples, we saw values like the AWS region, EC2 AMI, instance type, etc in the configuration itself.
 
@@ -433,6 +455,7 @@ resource "aws_instance" "instance" {
 
   ### Templates
   ### Modules
+  ### Infrastructure graph
 ]
 ---
 .left-column[
@@ -443,22 +466,42 @@ resource "aws_instance" "instance" {
 ]
 .right-column[
 ## Pros
-The state and configuration language of Terraform is very good.
+The state management and configuration language of Terraform is very good.
 
-Great for evolving an infrastructure, especially when you are starting out.
+Great for evolving an infrastructure, especially when you are not sure how the final infra will look like.
 
 Active community. Frequent releases.
 
+Does one thing - provision infrastructure - and that one thing well.
+
+Pretty fast, small learning curve.
+
+Encourages immutable infrastructure.
+
+]
+---
+.left-column[
+  ## Terraform Basics
+  ### - Installation
+  ### - Terraform Configuration
+  ### - Pros and cons
+]
+.right-column[
 ## Cons
 
-Cannot import existing infra and start managing.
+Cannot import existing infra and start managing in a straightforward way. (third party tool exists)
 
 Too strict with regard to immutability.
 
-Some weirdness in the configuration language - like can't pass map variables.
+Some weirdness in the configuration language. eg. - can't pass map variables to modules.
 
-Refactoring into modules is tricky when infra is already created
+Refactoring into modules is tricky when infra is already created.
 
+Renaming resources is not possible without delete and create.
+
+Sometimes you will endup manipulating your tfstate.
+
+Doesn't replace configration management tools like Ansible. Ansible can do what Terraform does.
 ]
 ---
 name: last-page
